@@ -1,83 +1,70 @@
-const addTaskBtn = document.getElementById('addTaskBtn');
 const randomBtn = document.getElementById('randomBtn');
-const container = document.getElementById('TaskContainer');
+const randomJSButton = document.getElementById('randomJSButton');
+const randomCButton = document.getElementById('randomCButton');
+const greedyJSButton = document.getElementById('greedyJSButton');
+const greedyCButton = document.getElementById('greedyCButton');
 const c1 = document.getElementById('C1Container');
 const c2 = document.getElementById('C2Container');
 
-const createTaskDiv = (value) => {
-  const taskDiv = document.createElement('div');
-  taskDiv.classList.add('task');
-
-  const taskInput = document.createElement('input');
-  taskInput.classList.add('taskInput');
-  taskInput.type = 'text';
-  taskInput.value = value;
-
-  taskDiv.appendChild(taskInput);
-  return taskDiv;
+const randomizeTaskAssignment = (times, n) => {
+  const clusters = Array.from({ length: n }, () => []);
+  for (let i = 0; i < times.length; i++) {
+    const cluster = clusters[Math.floor(Math.random() * n) % n];
+    cluster.push(times[i]);
+  }
+  return clusters;
 };
 
-addTaskBtn.addEventListener('click', () => {
-  const taskDiv = createTaskDiv('0');
-  container.appendChild(taskDiv);
-});
-
-// puede servir para mostrar la suma total del cluster
-// const getTimeSum = (c) => Array.from(c.children).reduce((previous, current) => {
-//   const toAdd = current.querySelector('input');
-//   // console.log(toAdd?.value);
-//   if (toAdd) {
-//     return previous + parseInt(toAdd.value, 10);
-//   }
-//   return previous;
-// }, 0);
-
-const randomizeTaskAssignment = (times) => {
-  const cluster1 = Array.from({ length: times.length }, () => Math.floor(Math.random() * 2));
-  const cluster2 = cluster1.map((x) => (x === 1 ? 0 : 1));
-  return [cluster1, cluster2];
+const addTaskArray = (clusterArray, cluster) => {
+  // add a parragraph with the times
+  const p = document.createElement('p');
+  p.innerHTML = clusterArray.join(', ');
+  p.className = 'tasks';
+  cluster.appendChild(p);
 };
 
-const getTimes = (c) => Array.from(c.children)
-  .map((x) => {
-    const input = x.querySelector('input');
-    if (input) {
-      return parseInt(input.value, 10);
-    }
-    return null;
-  })
-  .filter((x) => x !== null);
-
-const removeAllTasks = (c) => {
-  while (c.children.length > 0) {
-    const remove = c.querySelector('.task')
-    container.removeChild(remove);
+const getTimes = () => {
+  const times = document.getElementById('time-tasks').value;
+  return times.split(',').map((time) => parseInt(time, 10));
+};
+  
+const removeAllTasks = (container) => {
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
   }
 };
 
-const addTaskArray = (times, clusterArray, cluster) => {
-  clusterArray.forEach((element, index) => {
-    if (element) {
-      cluster.appendChild(createTaskDiv(times[index]));
-    }
-  });
+const getParams = () => {
+  const m = parseInt(document.getElementById('numClusters').value);
+  const times = getTimes();
+  return { m, times };
 };
-
-randomBtn.addEventListener('click', () => {
-  // Intente hacer lo de cargar el modulo wasm pero no pude
-
-  // Esto falla la segunda vez
-  // removeAllTasks(c1);
-  // removeAllTasks(c2);
-
-  // Define the input data
-  const times = getTimes(container);
-  const clusters = randomizeTaskAssignment(times);
-
-  randomizeTaskAssignment(times, clusters);
-
-  // quito las que ya estaban escritas y pongo nuevas con el cluster
+const showClusters = (clusters, container, m) => {
+  for (let i = 0; i < m; i++) {
+    const cluster = document.createElement('div');
+    cluster.className = 'cluster';
+    const title = document.createElement('p');
+    title.innerHTML = `Cluster ${i + 1}`;
+    title.classList.add('cluster-title');
+    cluster.appendChild(title);
+    addTaskArray(clusters[i], cluster);
+    container.appendChild(cluster);
+  }
+};
+  
+randomJSButton.addEventListener('click', () => {
+  const { m, times } = getParams();
+  const clusters = randomizeTaskAssignment(times, m);
+  const container = document.getElementById('cluster-container');
   removeAllTasks(container);
-  addTaskArray(times, clusters[0], c1);
-  addTaskArray(times, clusters[1], c2);
+  showClusters(clusters, container, m);
+});
+
+greedyJSButton.addEventListener('click', () => {
+  console.log('greedyCButton');
+  const { m, times } = getParams();
+  const clusters = greedyJS(times.length, m, times);
+  const container = document.getElementById('cluster-container');
+  removeAllTasks(container);
+  showClusters(clusters, container, m);
 });

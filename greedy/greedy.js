@@ -37,5 +37,3 @@ const greedyJS = (n, m, time_tasks) => {
   }
   return processor_assignments;
 };
-
-console.log(greedyJS(5, 2, [30, 50, 10, 20, 90]));

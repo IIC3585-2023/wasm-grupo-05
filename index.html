@@ -5,35 +5,49 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="assets/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   </head>
 
   <body>
-    <div class="task-container" id="TaskContainer"></div>
-    <div class="task">
-      <button id="addTaskBtn" , class="taskButton">+</button>
-    </div>
-
-    <div class="button-container">
-      <button class="assign-btn" id="randomBtn">Aleatorio</button>
-    </div>
-
-    <div class="cluster" id="Cluster1">
-      <span class="cluster-title">Cluster 1</span>
-      <div class="task-container" id="C1Container">
-      <!--   <div class="task"> -->
-      <!--     <button id="addTaskBtn" , class="taskButton">+</button> -->
-      <!--   </div> -->
+    <div class="row justify-content-center">
+      <div class="col justify-content-center col-3">
+        <p>Ingrese la duración de las tareas:</p>
+        <textarea name="time-tasks" id="time-tasks" class="w-100 form-control"></textarea>
       </div>
     </div>
 
-    <div class="cluster" id="Cluster2">
-      <span class="cluster-title">Cluster 2</span>
-      <div class="task-container" id="C2Container">
-      <!--   <div class="task"> -->
-      <!--     <button id="addTaskBtn" , class="taskButton">+</button> -->
-      <!--   </div> -->
+    <br><br>
+    <div class="row justify-content-center">
+      <div class="input-container col-3 justify-content-center">
+        <p>Número de clusters:</p>
+        <input class="w-100" type="number" id="numClusters" name="numClusters" min="1" max="10" />
       </div>
     </div>
+
+    <br><br>
+
+    <div class="row justify-content-center">
+      <div class="button-container">
+        <button class="assign-btn" id="randomJSButton">Aleatorio JS</button>
+      </div>
+      <div class="button-container">
+        <button class="assign-btn" id="randomCButton">Aleatorio C</button>
+      </div>
+      <div class="button-container">
+        <button class="assign-btn" id="greedyJSButton">Greedy JS</button>
+      </div>
+      <div class="button-container">
+        <button class="assign-btn" id="greedyCButton">Greedy C</button>
+      </div>
+    </div>
+    <br>
+
+    <div class="row justify-content-center">
+      <div id="cluster-container" class="col col-5"></div>
+    </div>
+
+    
   </body>
+  <script src="greedy/greedy.js"></script>
   <script src="assets/index.js"></script>
 </html>
