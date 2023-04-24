@@ -1,4 +1,3 @@
-
 // n - number of tasks
 // m - number of processors
 // time_tasks - array of processing times of tasks
@@ -9,7 +8,7 @@ const greedyJS = (n, m, time_tasks) => {
 
   // Arreglo que contiene la suma de los tiempos de las tareas asignadas a cada procesador
   const time_processors_sum = [];
-  
+
   for (let i = 0; i < m; i++) {
     processor_assignments.push([]);
     time_processors_sum.push(0);

@@ -27,7 +27,7 @@ const getTimes = () => {
   const times = document.getElementById('time-tasks').value;
   return times.split(',').map((time) => parseInt(time, 10));
 };
-  
+
 const removeAllTasks = (container) => {
   while (container.firstChild) {
     container.removeChild(container.firstChild);
@@ -51,10 +51,11 @@ const showClusters = (clusters, container, m) => {
     container.appendChild(cluster);
   }
 };
-  
+
 randomJSButton.addEventListener('click', () => {
   const { m, times } = getParams();
   const clusters = randomizeTaskAssignment(times, m);
+  console.log(clusters);
   const container = document.getElementById('cluster-container');
   removeAllTasks(container);
   showClusters(clusters, container, m);
@@ -68,3 +69,62 @@ greedyJSButton.addEventListener('click', () => {
   removeAllTasks(container);
   showClusters(clusters, container, m);
 });
+
+const arrayToMatrix = (arr, rows, cols) => {
+  const matrix = [];
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    for (let j = 0; j < cols; j++) {
+      const offset = i * cols + j;
+      // console.log(arr[offset], i, j);
+      if (arr[offset]) {
+        row.push(arr[offset]);
+      }
+    }
+    matrix.push(row);
+  }
+  return matrix;
+};
+// Wait for WASM compilation.
+Module.onRuntimeInitialized = () => {
+  const { randomC } = Module;
+
+  // ------//
+  // WASM //
+  // ------//
+  randomCButton.addEventListener('click', () => {
+    const { m, times } = getParams();
+    const timesArray = Uint32Array.from(times);
+    const timePtr = Module._malloc(timesArray.byteLength);
+    Module.HEAPU32.set(timesArray, timePtr >> 2);
+
+    const clusterArray = Uint32Array.from({ length: m * timesArray.length });
+    const clusterPtr = Module._malloc(clusterArray.byteLength);
+    Module.HEAPU32.set(clusterArray, clusterPtr >> 2);
+
+    const updatedTimesArray = Module.HEAPU32.subarray(
+      timePtr >> 2,
+      (timePtr >> 2) + timesArray.length,
+    );
+
+    const updatedClusterArray = Module.HEAPU32.subarray(
+      clusterPtr >> 2,
+      (clusterPtr >> 2) + m * timesArray.length,
+    );
+
+    const result = Module.ccall(
+      'randomC',
+      'int',
+      ['number', 'number', 'number', 'number'],
+      [timesArray.length, m, timePtr, clusterPtr],
+    );
+
+    const updatedTimes = Array.from(updatedTimesArray);
+    const updatedCluster = Array.from(updatedClusterArray);
+    const matrix = arrayToMatrix(updatedCluster, m, times.length);
+
+    const container = document.getElementById('cluster-container');
+    removeAllTasks(container);
+    showClusters(matrix, container, m);
+  });
+};
