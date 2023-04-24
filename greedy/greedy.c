@@ -8,13 +8,13 @@ int compare(const void* a, const void* b) {
 // n - number of tasks
 // m - number of processors
 // time_tasks - array of processing times of tasks
-int** greedy(int n, int m, int* time_tasks) {
+int greedy(int n, int m, int* time_tasks, int** processors_assignments) {
     // Arreglo de arreglos en que cada subarreglo tiene las
     // asignaciones (tiempo de la tarea) al procesador i
-    int** processors_assignments = malloc(m * sizeof(int*));
-    for (int i = 0; i < m; i++) {
-      processors_assignments[i] = calloc(n, sizeof(int));
-    }
+    // int** processors_assignments = malloc(m * sizeof(int*));
+    // for (int i = 0; i < m; i++) {
+    //   processors_assignments[i] = calloc(n, sizeof(int));
+    // }
 
     // Arreglo que contiene la suma de los tiempos de las tareas asignadas a cada procesador  
     int* time_processors_sum = calloc(m, sizeof(int));
@@ -42,7 +42,7 @@ int** greedy(int n, int m, int* time_tasks) {
     }
     free(time_processors_sum);
     free(n_tasks_processors);
-    return processors_assignments;
+    return 0;
 }
 
 int main() {
@@ -50,14 +50,14 @@ int main() {
   int m = 2;
   int tasks[5] = {30, 50, 10, 20, 90};
 
-  int** assignments = greedy(n, m, tasks); // call the greedy algorithm
-  for (int i = 0; i < m; i++) {
-      for (int j = 0; j < n; j++) {
-          if (assignments[i][j] != 0) {
-              printf("%d ", assignments[i][j]);
-          }
-      }
-      printf("\n");
-  }
+//   int** assignments = greedy(n, m, tasks); // call the greedy algorithm
+//   for (int i = 0; i < m; i++) {
+//       for (int j = 0; j < n; j++) {
+//           if (assignments[i][j] != 0) {
+//               printf("%d ", assignments[i][j]);
+//           }
+//       }
+//       printf("\n");
+//   }
     return 0;
 }

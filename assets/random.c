@@ -5,13 +5,13 @@
 // n - number of tasks
 // m - number of processors
 // time_tasks - array of processing times of tasks
-int** randomC(int n, int m, int* time_tasks) {
+int randomC(int n, int m, int* time_tasks, int** processors_assignments) {
     // Arreglo de arreglos en que cada subarreglo tiene las
     // asignaciones (tiempo de la tarea) al procesador i
-    int** processors_assignments = malloc(m * sizeof(int*));
-    for (int i = 0; i < m; i++) {
-      processors_assignments[i] = calloc(n, sizeof(int));
-    }
+    // int** processors_assignments = malloc(m * sizeof(int*));
+    // for (int i = 0; i < m; i++) {
+    //   processors_assignments[i] = calloc(n, sizeof(int));
+    // }
 
     // Arreglo que contiene la cantidad de tareas asignadas a cada procesador
     int* n_tasks_processors = calloc(m, sizeof(int));
@@ -27,7 +27,7 @@ int** randomC(int n, int m, int* time_tasks) {
         n_tasks_processors[random_processor]++;
     }
     free(n_tasks_processors);
-    return processors_assignments;
+    return 0;
 }
 
 int main() {
@@ -36,14 +36,14 @@ int main() {
   int tasks[5] = {30, 50, 10, 20, 90};
   
   srand (time(NULL));
-  int** assignments = randomC(n, m, tasks);
-  for (int i = 0; i < m; i++) {
-      for (int j = 0; j < n; j++) {
-          if (assignments[i][j] != 0) {
-              printf("%d ", assignments[i][j]);
-          }
-      }
-      printf("\n");
-  }
+//   int** assignments = randomC(n, m, tasks);
+//   for (int i = 0; i < m; i++) {
+//       for (int j = 0; j < n; j++) {
+//           if (assignments[i][j] != 0) {
+//               printf("%d ", assignments[i][j]);
+//           }
+//       }
+//       printf("\n");
+//   }
     return 0;
 }
