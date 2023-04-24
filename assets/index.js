@@ -3,6 +3,10 @@ const randomJSButton = document.getElementById('randomJSButton');
 const randomCButton = document.getElementById('randomCButton');
 const greedyJSButton = document.getElementById('greedyJSButton');
 const greedyCButton = document.getElementById('greedyCButton');
+const randomJSTime = document.getElementById('randomJSTime');
+const randomCTime = document.getElementById('randomCTime');
+const greedyJSTime = document.getElementById('greedyJSTime');
+const greedyCTime = document.getElementById('greedyCTime');
 const c1 = document.getElementById('C1Container');
 const c2 = document.getElementById('C2Container');
 
@@ -19,7 +23,8 @@ const addTaskArray = (clusterArray, cluster) => {
   // add a parragraph with the times
   const p = document.createElement('p');
   p.innerHTML = clusterArray.join(', ');
-  p.className = 'tasks';
+  p.classList.add('tasks');
+  p.classList.add('overflow-auto');
   cluster.appendChild(p);
 };
 
@@ -42,7 +47,7 @@ const getParams = () => {
 const showClusters = (clusters, container, m) => {
   for (let i = 0; i < m; i++) {
     const cluster = document.createElement('div');
-    cluster.className = 'cluster';
+    cluster.classList.add('cluster');
     const title = document.createElement('p');
     title.innerHTML = `Cluster ${i + 1}`;
     title.classList.add('cluster-title');
@@ -54,20 +59,26 @@ const showClusters = (clusters, container, m) => {
 
 randomJSButton.addEventListener('click', () => {
   const { m, times } = getParams();
+  const initialTime = performance.now();
   const clusters = randomizeTaskAssignment(times, m);
-  console.log(clusters);
+  const endTime = performance.now();
+  randomJSTime.innerHTML = `${endTime - initialTime} ms`;
   const container = document.getElementById('cluster-container');
   removeAllTasks(container);
   showClusters(clusters, container, m);
+
 });
 
 greedyJSButton.addEventListener('click', () => {
-  console.log('greedyCButton');
   const { m, times } = getParams();
+  const initialTime = performance.now();
   const clusters = greedyJS(times.length, m, times);
+  const endTime = performance.now();
+  greedyJSTime.innerHTML = `${endTime - initialTime} ms`;
   const container = document.getElementById('cluster-container');
   removeAllTasks(container);
   showClusters(clusters, container, m);
+
 });
 
 const arrayToMatrix = (arr, rows, cols) => {
@@ -97,28 +108,68 @@ Module.onRuntimeInitialized = () => {
     const timesArray = Uint32Array.from(times);
     const timePtr = Module._malloc(timesArray.byteLength);
     Module.HEAPU32.set(timesArray, timePtr >> 2);
-
+    
     const clusterArray = Uint32Array.from({ length: m * timesArray.length });
     const clusterPtr = Module._malloc(clusterArray.byteLength);
     Module.HEAPU32.set(clusterArray, clusterPtr >> 2);
-
+    
     const updatedTimesArray = Module.HEAPU32.subarray(
       timePtr >> 2,
       (timePtr >> 2) + timesArray.length,
-    );
-
-    const updatedClusterArray = Module.HEAPU32.subarray(
-      clusterPtr >> 2,
-      (clusterPtr >> 2) + m * timesArray.length,
-    );
-
+      );
+      
+      const updatedClusterArray = Module.HEAPU32.subarray(
+        clusterPtr >> 2,
+        (clusterPtr >> 2) + m * timesArray.length,
+        );
+        
+    const initialTime = performance.now();
     const result = Module.ccall(
       'randomC',
       'int',
       ['number', 'number', 'number', 'number'],
       [timesArray.length, m, timePtr, clusterPtr],
     );
+    const endTime = performance.now();
+    randomCTime.innerHTML = `${endTime - initialTime} ms`;
+    const updatedTimes = Array.from(updatedTimesArray);
+    const updatedCluster = Array.from(updatedClusterArray);
+    const matrix = arrayToMatrix(updatedCluster, m, times.length);
 
+    const container = document.getElementById('cluster-container');
+    removeAllTasks(container);
+    showClusters(matrix, container, m);
+  });
+
+  greedyCButton.addEventListener('click', () => {
+    const { m, times } = getParams();
+    const timesArray = Uint32Array.from(times);
+    const timePtr = Module._malloc(timesArray.byteLength);
+    Module.HEAPU32.set(timesArray, timePtr >> 2);
+    
+    const clusterArray = Uint32Array.from({ length: m * timesArray.length });
+    const clusterPtr = Module._malloc(clusterArray.byteLength);
+    Module.HEAPU32.set(clusterArray, clusterPtr >> 2);
+    
+    const updatedTimesArray = Module.HEAPU32.subarray(
+      timePtr >> 2,
+      (timePtr >> 2) + timesArray.length,
+      );
+      
+      const updatedClusterArray = Module.HEAPU32.subarray(
+        clusterPtr >> 2,
+        (clusterPtr >> 2) + m * timesArray.length,
+        );
+        
+    const initialTime = performance.now();
+    const result = Module.ccall(
+      'greedyC',
+      'int',
+      ['number', 'number', 'number', 'number'],
+      [timesArray.length, m, timePtr, clusterPtr],
+    );
+    const endTime = performance.now();
+    greedyCTime.innerHTML = `${endTime - initialTime} ms`;
     const updatedTimes = Array.from(updatedTimesArray);
     const updatedCluster = Array.from(updatedClusterArray);
     const matrix = arrayToMatrix(updatedCluster, m, times.length);
