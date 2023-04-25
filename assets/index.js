@@ -98,8 +98,6 @@ const arrayToMatrix = (arr, rows, cols) => {
 };
 // Wait for WASM compilation.
 Module.onRuntimeInitialized = () => {
-  const { randomC } = Module;
-
   // ------//
   // WASM //
   // ------//
@@ -112,19 +110,14 @@ Module.onRuntimeInitialized = () => {
     const clusterArray = Uint32Array.from({ length: m * timesArray.length });
     const clusterPtr = Module._malloc(clusterArray.byteLength);
     Module.HEAPU32.set(clusterArray, clusterPtr >> 2);
-    
-    const updatedTimesArray = Module.HEAPU32.subarray(
-      timePtr >> 2,
-      (timePtr >> 2) + timesArray.length,
-      );
       
-      const updatedClusterArray = Module.HEAPU32.subarray(
-        clusterPtr >> 2,
-        (clusterPtr >> 2) + m * timesArray.length,
-        );
+    const updatedClusterArray = Module.HEAPU32.subarray(
+      clusterPtr >> 2,
+      (clusterPtr >> 2) + m * timesArray.length,
+      );
         
     const initialTime = performance.now();
-    const result = Module.ccall(
+    Module.ccall(
       'randomC',
       'int',
       ['number', 'number', 'number', 'number'],
@@ -132,7 +125,6 @@ Module.onRuntimeInitialized = () => {
     );
     const endTime = performance.now();
     randomCTime.innerHTML = `${endTime - initialTime} ms`;
-    const updatedTimes = Array.from(updatedTimesArray);
     const updatedCluster = Array.from(updatedClusterArray);
     const matrix = arrayToMatrix(updatedCluster, m, times.length);
 
@@ -150,19 +142,13 @@ Module.onRuntimeInitialized = () => {
     const clusterArray = Uint32Array.from({ length: m * timesArray.length });
     const clusterPtr = Module._malloc(clusterArray.byteLength);
     Module.HEAPU32.set(clusterArray, clusterPtr >> 2);
-    
-    const updatedTimesArray = Module.HEAPU32.subarray(
-      timePtr >> 2,
-      (timePtr >> 2) + timesArray.length,
-      );
       
-      const updatedClusterArray = Module.HEAPU32.subarray(
-        clusterPtr >> 2,
-        (clusterPtr >> 2) + m * timesArray.length,
-        );
-        
+    const updatedClusterArray = Module.HEAPU32.subarray(
+      clusterPtr >> 2,
+      (clusterPtr >> 2) + m * timesArray.length,
+      );
     const initialTime = performance.now();
-    const result = Module.ccall(
+    Module.ccall(
       'greedyC',
       'int',
       ['number', 'number', 'number', 'number'],
@@ -170,7 +156,6 @@ Module.onRuntimeInitialized = () => {
     );
     const endTime = performance.now();
     greedyCTime.innerHTML = `${endTime - initialTime} ms`;
-    const updatedTimes = Array.from(updatedTimesArray);
     const updatedCluster = Array.from(updatedClusterArray);
     const matrix = arrayToMatrix(updatedCluster, m, times.length);
 
