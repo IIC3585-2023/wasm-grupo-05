@@ -129,6 +129,8 @@ Module.onRuntimeInitialized = () => {
     const matrix = arrayToMatrix(updatedCluster, m, times.length);
 
     const container = document.getElementById('cluster-container');
+    Module._free(timePtr);
+    Module._free(clusterPtr);
     removeAllTasks(container);
     showClusters(matrix, container, m);
   });
@@ -158,6 +160,8 @@ Module.onRuntimeInitialized = () => {
     greedyCTime.innerHTML = `${endTime - initialTime} ms`;
     const updatedCluster = Array.from(updatedClusterArray);
     const matrix = arrayToMatrix(updatedCluster, m, times.length);
+    Module._free(timePtr);
+    Module._free(clusterPtr);
 
     const container = document.getElementById('cluster-container');
     removeAllTasks(container);
