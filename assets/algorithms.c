@@ -25,10 +25,10 @@ int compare(const void* a, const void* b) {
 }
 int partition(int arr[], int left, int right, int pivot) {
     while (left <= right) {
-        while (arr[left] < pivot) {  // Changed from > to <
+        while (arr[left] > pivot) {  // Changed from > to <
             left++;
         }
-        while (arr[right] > pivot) { // Changed from < to >
+        while (arr[right] < pivot) { // Changed from < to >
             right--;
         }
         if (left <= right) {
