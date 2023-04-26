@@ -105,7 +105,7 @@ Module.onRuntimeInitialized = () => {
     const { m, times } = getParams();
     const timesArray = Uint32Array.from(times);
     const timePtr = Module._malloc(timesArray.byteLength);
-    Module.HEAPU32.set(timesArray, timePtr >> 4);
+    Module.HEAPU32.set(timesArray, timePtr >> 2);
     
     const clusterArray = Uint32Array.from({ length: m * timesArray.length });
     const clusterPtr = Module._malloc(clusterArray.byteLength);
