@@ -1,28 +1,54 @@
 // n - number of tasks
 // m - number of processors
 // time_tasks - array of processing times of tasks
+function quicksort(arr, left = 0, right = arr.length - 1) {  if (left >= right) {
+  return;
+}
+
+const pivot = arr[Math.floor((left + right) / 2)];
+const index = partition(arr, left, right, pivot);
+
+quicksort(arr, left, index - 1);
+quicksort(arr, index, right);
+}
+
+function partition(arr, left, right, pivot) {
+while (left <= right) {
+  while (arr[left] > pivot) {  // Changed from < to >
+    left++;
+  }
+
+  while (arr[right] < pivot) { // Changed from > to <
+    right--;
+  }
+
+  if (left <= right) {
+    swap(arr, left, right);
+    left++;
+    right--;
+  }
+}
+
+return left;
+}
+
+function swap(arr, i, j) {
+const temp = arr[i];
+arr[i] = arr[j];
+arr[j] = temp;
+}
+
 const greedyJS = (n, m, time_tasks) => {
-  // Arreglo de arreglos en que cada subarreglo tiene las
-  // asignaciones (tiempo de la tarea) al procesador i
   const processor_assignments = [];
-
-  // Arreglo que contiene la suma de los tiempos de las tareas asignadas a cada procesador
   const time_processors_sum = [];
-
   for (let i = 0; i < m; i++) {
     processor_assignments.push([]);
     time_processors_sum.push(0);
   }
-
-  // Ordenar las tareas de mayor a menor
-  time_tasks.sort((a, b) => b - a);
-
-  // Asignar las tareas a los procesadores
-  // Para cada tarea
+  quicksort(time_tasks);
   let min_completion_time;
   let min_processor;
   for (let i = 0; i < n; i++) {
-    // Encontrar el procesador con el menor tiempo de completación
     min_completion_time = time_processors_sum[0];
     min_processor = 0;
     for (let j = 1; j < m; j++) {
