@@ -145,17 +145,13 @@ Module.onRuntimeInitialized = () => {
     const clusterPtr = Module._malloc(clusterArray.byteLength);
     Module.HEAPU32.set(clusterArray, clusterPtr >> 2);
       
-    const updatedClusterArray = Module.HEAPU32.subarray(
-      clusterPtr >> 2,
-      (clusterPtr >> 2) + m * timesArray.length,
-      );
+      const updatedClusterArray = Module.HEAPU32.subarray(
+        clusterPtr >> 2,
+        (clusterPtr >> 2) + m * timesArray.length,
+        );
+    
     const initialTime = performance.now();
-    Module.ccall(
-      'greedyC',
-      'int',
-      ['number', 'number', 'number', 'number'],
-      [timesArray.length, m, timePtr, clusterPtr],
-    );
+    Module._greedyC(timesArray.length, m, timePtr, clusterPtr);
     const endTime = performance.now();
     greedyCTime.innerHTML = `${endTime - initialTime} ms`;
     const updatedCluster = Array.from(updatedClusterArray);
@@ -164,6 +160,9 @@ Module.onRuntimeInitialized = () => {
     Module._free(clusterPtr);
 
     const container = document.getElementById('cluster-container');
+    Module._free(timePtr);
+    Module._free(clusterPtr);
+
     removeAllTasks(container);
     showClusters(matrix, container, m);
   });
