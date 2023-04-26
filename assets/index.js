@@ -107,20 +107,20 @@ Module.onRuntimeInitialized = () => {
     const { m, times } = getParams();
     const timesArray = Uint32Array.from(times);
     const timePtr = Module._malloc(timesArray.byteLength);
-    Module.HEAPU32.set(timesArray, timePtr >> 2);
+    Module.HEAPU32.set(timesArray, timePtr >> 4);
     
     const clusterArray = Uint32Array.from({ length: m * timesArray.length });
     const clusterPtr = Module._malloc(clusterArray.byteLength);
-    Module.HEAPU32.set(clusterArray, clusterPtr >> 2);
+    Module.HEAPU32.set(clusterArray, clusterPtr >> 4);
     
     const updatedTimesArray = Module.HEAPU32.subarray(
-      timePtr >> 2,
-      (timePtr >> 2) + timesArray.length,
+      timePtr >> 4,
+      (timePtr >> 4) + timesArray.length,
       );
       
       const updatedClusterArray = Module.HEAPU32.subarray(
-        clusterPtr >> 2,
-        (clusterPtr >> 2) + m * timesArray.length,
+        clusterPtr >> 4,
+        (clusterPtr >> 4) + m * timesArray.length,
         );
         
     const initialTime = performance.now();
@@ -137,6 +137,8 @@ Module.onRuntimeInitialized = () => {
     const matrix = arrayToMatrix(updatedCluster, m, times.length);
 
     const container = document.getElementById('cluster-container');
+    Module._free(timePtr);
+    Module._free(clusterPtr);
     removeAllTasks(container);
     showClusters(matrix, container, m);
   });
@@ -160,14 +162,9 @@ Module.onRuntimeInitialized = () => {
         clusterPtr >> 2,
         (clusterPtr >> 2) + m * timesArray.length,
         );
-        
+    
     const initialTime = performance.now();
-    const result = Module.ccall(
-      'greedyC',
-      'int',
-      ['number', 'number', 'number', 'number'],
-      [timesArray.length, m, timePtr, clusterPtr],
-    );
+    Module._greedyC(timesArray.length, m, timePtr, clusterPtr);
     const endTime = performance.now();
     greedyCTime.innerHTML = `${endTime - initialTime} ms`;
     const updatedTimes = Array.from(updatedTimesArray);
@@ -175,6 +172,9 @@ Module.onRuntimeInitialized = () => {
     const matrix = arrayToMatrix(updatedCluster, m, times.length);
 
     const container = document.getElementById('cluster-container');
+    Module._free(timePtr);
+    Module._free(clusterPtr);
+
     removeAllTasks(container);
     showClusters(matrix, container, m);
   });
